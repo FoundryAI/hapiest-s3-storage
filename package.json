@@ -1,0 +1,37 @@
+{
+  "name": "hapiest-s3-storage",
+  "version": "0.0.1",
+  "description": "A simple s3 storage service that's flexible and allows mocking of s3 locally",
+  "main": "index.js",
+  "scripts": {
+    "test": "node node_modules/mocha/bin/mocha test/unit --recursive"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jonathan-fulton/hapiest-s3-storage.git"
+  },
+  "keywords": [
+    "hapiest",
+    "s3",
+    "storage",
+    "localstorage"
+  ],
+  "author": "Jonathan Fulton",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jonathan-fulton/hapiest-s3-storage/issues"
+  },
+  "homepage": "https://github.com/jonathan-fulton/hapiest-s3-storage#readme",
+  "devDependencies": {
+    "config-uncached": "1.0.2",
+    "hapiest-logger": "0.0.5",
+    "mocha": "2.5.3",
+    "rmdir": "1.2.0",
+    "should": "9.0.2"
+  },
+  "dependencies": {
+    "aws-sdk": "2.4.0",
+    "joi": "8.4.2",
+    "mock-aws-s3": "2.3.0"
+  }
+}

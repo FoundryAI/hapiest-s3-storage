@@ -1,0 +1,9 @@
+{
+  "storage": {
+    "type": "localstorage",
+    "bucket": "mybucket",
+    "config": {
+      "path": "testing_localstorage"
+    }
+  }
+}
