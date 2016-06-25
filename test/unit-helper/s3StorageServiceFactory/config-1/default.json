@@ -2,7 +2,7 @@
   "storage": {
     "type": "localstorage",
     "bucket": "mybucket",
-    "config": {
+    "localConfig": {
       "path": "testing_localstorage"
     }
   }

@@ -20,7 +20,7 @@ describe('S3StorageServiceFactory', function() {
            const s3Service = S3StorageServiceFactory.create({
                type: 'localstorage',
                bucket: 'mybucket',
-               config: {
+               localConfig: {
                    path: './'
                }
            }, logger, basePath);
@@ -33,7 +33,7 @@ describe('S3StorageServiceFactory', function() {
 
            const s3Service = S3StorageServiceFactory.create({
                type: 'localstorage',
-               config: {
+               localConfig: {
                    path: Path.join(__dirname,'../unit-helper/s3StorageServiceFactory')
                }
            }, logger, basePath);
@@ -46,7 +46,7 @@ describe('S3StorageServiceFactory', function() {
            const s3Service = S3StorageServiceFactory.create({
                type: 's3',
                bucket: 'mybucket',
-               config: {
+               s3Config: {
                    userName: 'user',
                    awsAccessKey: 'awsAccessKey',
                    awsSecretKey: 'awsSecretKey'
@@ -60,7 +60,7 @@ describe('S3StorageServiceFactory', function() {
        it('Should permit bucket to be optional for s3 storage', function() {
            const s3Service = S3StorageServiceFactory.create({
                type: 's3',
-               config: {
+               s3Config: {
                    userName: 'user',
                    awsAccessKey: 'awsAccessKey',
                    awsSecretKey: 'awsSecretKey'
@@ -71,13 +71,49 @@ describe('S3StorageServiceFactory', function() {
            s3Service.getType().should.eql('s3');
        });
 
+       it('Should permit both s3Config and localConfig to be present for s3 type', function() {
+           const s3Service = S3StorageServiceFactory.create({
+               type: 's3',
+               bucket: 'myUbcket',
+               localConfig: {
+                   path: './'
+               },
+               s3Config: {
+                   userName: 'user',
+                   awsAccessKey: 'awsAccessKey',
+                   awsSecretKey: 'awsSecretKey'
+               }
+           }, logger, basePath);
+
+           Should.exist(s3Service);
+           s3Service.getType().should.eql('s3');
+       });
+
+       it('Should permit both s3Config and localConfig to be present for localstorage type', function() {
+           const s3Service = S3StorageServiceFactory.create({
+               type: 'localstorage',
+               bucket: 'myUbcket',
+               localConfig: {
+                   path: './'
+               },
+               s3Config: {
+                   userName: 'user',
+                   awsAccessKey: 'awsAccessKey',
+                   awsSecretKey: 'awsSecretKey'
+               }
+           }, logger, basePath);
+
+           Should.exist(s3Service);
+           s3Service.getType().should.eql('localstorage');
+       });
+
        it('Should throw an error if the type is invalid', function() {
            let err = null;
            try {
                const s3Service = S3StorageServiceFactory.create({
                    type: 'invalid',
                    bucket: 'mybucket',
-                   config: {
+                   localConfig: {
                        path: Path.join(__dirname, '../unit-helper/s3StorageServiceFactory')
                    }
                }, logger, basePath);
@@ -95,7 +131,7 @@ describe('S3StorageServiceFactory', function() {
                const s3Service = S3StorageServiceFactory.create({
                    type: 'invalid',
                    bucket: 'mybucket',
-                   config: {}
+                   localConfig: {}
                }, logger, basePath);
            } catch (e) {
                err = e;
@@ -105,7 +141,7 @@ describe('S3StorageServiceFactory', function() {
            err.isJoi.should.be.True();
        });
 
-       it('Should throw an error if config is not provided for localstorage', function() {
+       it('Should throw an error if localConfig is not provided for localstorage', function() {
            let err = null;
            try {
                const s3Service = S3StorageServiceFactory.create({
@@ -120,12 +156,12 @@ describe('S3StorageServiceFactory', function() {
            err.isJoi.should.be.True();
        });
 
-       it('Should throw an error if config.userName is not provided for s3', function() {
+       it('Should throw an error if s3Config.userName is not provided for s3', function() {
            let err = null;
            try {
                const s3Service = S3StorageServiceFactory.create({
                    type: 's3',
-                   config: {
+                   s3Config: {
                        awsAccessKey: 'awsAccessKey',
                        awsSecretKey: 'awsSecretKey'
                    }
@@ -138,12 +174,12 @@ describe('S3StorageServiceFactory', function() {
            err.isJoi.should.be.True();
        });
 
-       it('Should throw an error if config.awsAccessKey is not provided for s3', function() {
+       it('Should throw an error if s3Config.awsAccessKey is not provided for s3', function() {
            let err = null;
            try {
                const s3Service = S3StorageServiceFactory.create({
                    type: 's3',
-                   config: {
+                   s3Config: {
                        userName: 'userName',
                        awsSecretKey: 'awsSecretKey'
                    }
@@ -156,13 +192,13 @@ describe('S3StorageServiceFactory', function() {
            err.isJoi.should.be.True();
        });
 
-       it('Should throw an error if config.awsSecretKey is not provided for s3', function() {
+       it('Should throw an error if s3Config.awsSecretKey is not provided for s3', function() {
            let err = null;
            try {
                const s3Service = S3StorageServiceFactory.create({
                    type: 's3',
                    bucket: 'bucket',
-                   config: {
+                   s3Config: {
                        userName: 'userName',
                        awsAccessKey: 'awsAccessKey'
                    }
@@ -175,7 +211,7 @@ describe('S3StorageServiceFactory', function() {
            err.isJoi.should.be.True();
        });
 
-       it('Should throw an error if config is not provided for s3', function() {
+       it('Should throw an error if s3Config is not provided for s3', function() {
            let err = null;
            try {
                const s3Service = S3StorageServiceFactory.create({

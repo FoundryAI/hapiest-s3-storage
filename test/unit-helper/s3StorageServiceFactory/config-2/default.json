@@ -2,7 +2,7 @@
   "storage": {
     "type": "s3",
     "bucket": "mybucket",
-    "config": {
+    "s3Config": {
       "userName": "userName",
       "awsAccessKey": "awsAccessKey",
       "awsSecretKey": "awsSecretKey"

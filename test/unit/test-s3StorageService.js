@@ -20,14 +20,14 @@ const testBucket2 = 'anotherbucket';
 const s3ServiceLocalStorageWithBucket = S3StorageServiceFactory.create({
     type: 'localstorage',
     bucket: testBucket1,
-    config: {
+    localConfig: {
         path: './'
     }
 }, logger, basePath);
 
 const s3ServiceLocalStorageWithoutBucket = S3StorageServiceFactory.create({
     type: 'localstorage',
-    config: {
+    localConfig: {
         path: './'
     }
 }, logger, basePath);
@@ -35,7 +35,7 @@ const s3ServiceLocalStorageWithoutBucket = S3StorageServiceFactory.create({
 const s3ServiceWithBucket = S3StorageServiceFactory.create({
     type: 's3',
     bucket: 'vizualai-test',
-    config: {
+    s3Config: {
         userName: NodeConfig.get('aws.userName'),
         awsAccessKey: NodeConfig.get('aws.awsAccessKey'),
         awsSecretKey: NodeConfig.get('aws.awsSecretKey')
