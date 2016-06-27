@@ -27,6 +27,8 @@ describe('S3StorageServiceFactory', function() {
 
            Should.exist(s3Service);
            s3Service.getType().should.eql('localstorage');
+           s3Service.getBaseEndpointUrl().should.eql(Path.resolve(basePath, 'mybucket'));
+           s3Service.getUrl('mykey').should.eql(Path.resolve(basePath, 'mybucket', 'mykey'));
        });
 
        it('Should permit bucket to be optional for localstorage', function() {
@@ -34,12 +36,15 @@ describe('S3StorageServiceFactory', function() {
            const s3Service = S3StorageServiceFactory.create({
                type: 'localstorage',
                localConfig: {
-                   path: Path.join(__dirname,'../unit-helper/s3StorageServiceFactory')
+                   path: Path.join(__dirname,'../unit-helper/s3StorageServiceFactory'),
+                   baseUrl: 'http://localhost:3000/localstorage'
                }
            }, logger, basePath);
 
            Should.exist(s3Service);
            s3Service.getType().should.eql('localstorage');
+           s3Service.getBaseEndpointUrl('mybucket').should.eql('http://localhost:3000/localstorage/mybucket');
+           s3Service.getUrl('mynewkey', 'anotherbucket').should.eql('http://localhost:3000/localstorage/anotherbucket/mynewkey');
        });
 
        it('Should create an s3 s3Service', function() {
@@ -55,6 +60,8 @@ describe('S3StorageServiceFactory', function() {
 
            Should.exist(s3Service);
            s3Service.getType().should.eql('s3');
+           s3Service.getBaseEndpointUrl().should.eql('https://s3.amazonaws.com/mybucket');
+           s3Service.getUrl('mykey').should.eql('https://s3.amazonaws.com/mybucket/mykey');
        });
 
        it('Should permit bucket to be optional for s3 storage', function() {
@@ -69,6 +76,8 @@ describe('S3StorageServiceFactory', function() {
 
            Should.exist(s3Service);
            s3Service.getType().should.eql('s3');
+           s3Service.getBaseEndpointUrl('somebucket').should.eql('https://s3.amazonaws.com/somebucket');
+           s3Service.getUrl('anotherkey', 'somebucket').should.eql('https://s3.amazonaws.com/somebucket/anotherkey');
        });
 
        it('Should permit both s3Config and localConfig to be present for s3 type', function() {
