@@ -1,6 +1,6 @@
 {
   "name": "hapiest-s3-storage",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "A simple s3 storage service that's flexible and allows mocking of s3 locally",
   "main": "index.js",
   "scripts": {
@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "aws-sdk": "2.4.0",
+    "bluebird": "3.4.1",
     "joi": "8.4.2",
     "mock-aws-s3": "2.3.0"
   }
