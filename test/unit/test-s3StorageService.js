@@ -5,6 +5,7 @@ const Promise = require('bluebird');
 const Path = require('path');
 const Fs = require('fs');
 const rmdir = require('rmdir');
+const Sinon = require('sinon');
 const NodeConfig = require('config');
 const S3StorageServiceFactory = require('../../lib/s3StorageServiceFactory');
 
@@ -259,6 +260,83 @@ describe('S3StorageService', function() {
 
                     resultLongKey.Key.should.eql(`images/tmp/${testKey}`);
                     resultLongKey.Body.should.eql(testFileBody);
+                })
+                ;
+        });
+        
+        it('Should retry putObject when maxRetriesOnTimeout > 0', function() {
+            const testKey = 'myPutKey';
+
+            let timesCalled = 0;
+            const requestTimeoutErr = new Error('RequestTimeout');
+            requestTimeoutErr.code = 'RequestTimeout';
+            const _putObjectSimpleStub = Sinon.stub(s3ServiceWithBucketAndKeyPrefix, '_putObjectSimple', function(params) {
+                timesCalled += 1;
+                if (timesCalled === 1 || timesCalled === 2) {
+                    return Promise.reject(requestTimeoutErr);
+                } else {
+                    _putObjectSimpleStub.restore();
+                    return s3ServiceWithBucketAndKeyPrefix._putObjectSimple(params);
+                }
+            });
+
+            const _putObjectRecursiveSpy = Sinon.spy(s3ServiceWithBucketAndKeyPrefix, '_putObjectRecursive');
+
+            return Promise.resolve()
+                .then(() => s3ServiceWithBucketAndKeyPrefix.deleteObject({Key: testKey}))
+                .then(() => s3ServiceWithBucketAndKeyPrefix.putObject({
+                    Key: testKey,
+                    Body: testFileBody
+                }))
+                .then(results => s3ServiceWithBucketAndKeyPrefix.getObject({Key: testKey}))
+                .then(result => {
+                    result.Key.should.eql(`images/tmp/${testKey}`);
+                    result.Body.should.eql(testFileBody);
+                    _putObjectRecursiveSpy.calledThrice.should.be.True();
+                })
+                .finally(() => {
+                    _putObjectSimpleStub.restore();
+                    _putObjectRecursiveSpy.restore();
+                })
+            ;
+        });
+
+        it('Should throw an error if it hits too many RequestTimeout errors', function() {
+            const testKey = 'myPutKey';
+
+            let timesCalled = 0;
+            const requestTimeoutErr = new Error('RequestTimeout');
+            requestTimeoutErr.code = 'RequestTimeout';
+            const _putObjectSimpleStub = Sinon.stub(s3ServiceWithBucketAndKeyPrefix, '_putObjectSimple', function(params) {
+                timesCalled += 1;
+                if (timesCalled <= 6) {
+                    return Promise.reject(requestTimeoutErr);
+                } else {
+                    _putObjectSimpleStub.restore();
+                    return s3ServiceWithBucketAndKeyPrefix._putObjectSimple(params);
+                }
+            });
+
+            const _putObjectRecursiveSpy = Sinon.spy(s3ServiceWithBucketAndKeyPrefix, '_putObjectRecursive');
+
+            let expectedError;
+            return Promise.resolve()
+                .then(() => s3ServiceWithBucketAndKeyPrefix.deleteObject({Key: testKey}))
+                .then(() => s3ServiceWithBucketAndKeyPrefix.putObject({
+                    Key: testKey,
+                    Body: testFileBody
+                }))
+                .catch(err => expectedError = err)
+                .then(() => {
+                    Should.exist(expectedError);
+                    expectedError.code.should.eql('MaxRetriesReached');
+                    expectedError.message.should.eql('S3StorageService: max retries (5) on timeout reached.  Search for AWS SDK S3 RequestTimeout errors and how to resolve them.');
+
+                    _putObjectRecursiveSpy.callCount.should.eql(6);
+                })
+                .finally(() => {
+                    _putObjectSimpleStub.restore();
+                    _putObjectRecursiveSpy.restore();
                 })
                 ;
         });

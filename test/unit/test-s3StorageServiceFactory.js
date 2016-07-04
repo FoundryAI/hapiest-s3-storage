@@ -51,6 +51,7 @@ describe('S3StorageServiceFactory', function() {
            const s3Service = S3StorageServiceFactory.create({
                type: 's3',
                bucket: 'mybucket',
+               maxRetriesOnTimeout: 10,
                s3Config: {
                    userName: 'user',
                    awsAccessKey: 'awsAccessKey',
@@ -102,6 +103,7 @@ describe('S3StorageServiceFactory', function() {
            const s3Service = S3StorageServiceFactory.create({
                type: 'localstorage',
                bucket: 'myUbcket',
+               maxRetriesOnTimeout: 2,
                localConfig: {
                    path: './'
                },
