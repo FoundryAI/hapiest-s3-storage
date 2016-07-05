@@ -81,6 +81,23 @@ describe('S3StorageServiceFactory', function() {
            s3Service.getUrl('anotherkey', 'somebucket').should.eql('https://s3.amazonaws.com/somebucket/anotherkey');
        });
 
+       it('Should allow httpTimeoutMs parameter for s3 storage', function() {
+           const s3Service = S3StorageServiceFactory.create({
+               type: 's3',
+               s3Config: {
+                   userName: 'user',
+                   awsAccessKey: 'awsAccessKey',
+                   awsSecretKey: 'awsSecretKey',
+                   httpTimeoutMs: 15000
+               }
+           }, logger, basePath);
+
+           Should.exist(s3Service);
+           s3Service.getType().should.eql('s3');
+           s3Service.getBaseEndpointUrl('somebucket').should.eql('https://s3.amazonaws.com/somebucket');
+           s3Service.getUrl('anotherkey', 'somebucket').should.eql('https://s3.amazonaws.com/somebucket/anotherkey');
+       });
+
        it('Should permit both s3Config and localConfig to be present for s3 type', function() {
            const s3Service = S3StorageServiceFactory.create({
                type: 's3',

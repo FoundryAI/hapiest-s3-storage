@@ -1,6 +1,6 @@
 {
   "name": "hapiest-s3-storage",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "A simple s3 storage service that's flexible and allows mocking of s3 locally",
   "main": "index.js",
   "scripts": {

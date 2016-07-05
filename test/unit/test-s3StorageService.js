@@ -49,7 +49,8 @@ const s3ServiceWithBucket = S3StorageServiceFactory.create({
     s3Config: {
         userName: NodeConfig.get('aws.userName'),
         awsAccessKey: NodeConfig.get('aws.awsAccessKey'),
-        awsSecretKey: NodeConfig.get('aws.awsSecretKey')
+        awsSecretKey: NodeConfig.get('aws.awsSecretKey'),
+        httpTimeoutMs: 15000
     }
 });
 
@@ -61,6 +62,18 @@ const s3ServiceWithBucketAndKeyPrefix = S3StorageServiceFactory.create({
         userName: NodeConfig.get('aws.userName'),
         awsAccessKey: NodeConfig.get('aws.awsAccessKey'),
         awsSecretKey: NodeConfig.get('aws.awsSecretKey')
+    }
+});
+
+const s3ServiceForceTimeout = S3StorageServiceFactory.create({
+    type: 's3',
+    bucket: 'vizualai-test',
+    keyPrefix: 'images/tmp',
+    s3Config: {
+        userName: NodeConfig.get('aws.userName'),
+        awsAccessKey: NodeConfig.get('aws.awsAccessKey'),
+        awsSecretKey: NodeConfig.get('aws.awsSecretKey'),
+        httpTimeoutMs: 1
     }
 });
 
@@ -137,7 +150,7 @@ describe('S3StorageService', function() {
 
         it('Should upload an object and then get the object with the same key', function () {
             var testKey = 'myUploadKey';
-            s3ServiceLocalStorageWithBucket.upload({
+            return s3ServiceLocalStorageWithBucket.upload({
                 Key: testKey,
                 Bucket: testBucket1,
                 Body: testFileBody
@@ -224,16 +237,13 @@ describe('S3StorageService', function() {
 
         it('Should upload an object and then get the object with the same key', function () {
             var testKey = 'myUploadKey';
-            s3ServiceWithBucket.upload({
+            return s3ServiceWithBucket.upload({
                 Key: testKey,
-                Bucket: testBucket1,
                 Body: testFileBody
             })
             .then(result =>{
-                (Fs.existsSync(Path.join(basePath, testBucket1, testKey))).should.be.equal(true);
                 return s3ServiceWithBucket.getObject({
-                    Key: testKey,
-                    Bucket: testBucket1
+                    Key: testKey
                 })
             })
             .then(result => {
@@ -339,6 +349,22 @@ describe('S3StorageService', function() {
                     _putObjectRecursiveSpy.restore();
                 })
                 ;
+        });
+
+        it('Should timeout when uploading', function () {
+            const testKey = 'myUploadKey';
+            var expectedError;
+            return s3ServiceForceTimeout.upload({
+                    Key: testKey,
+                    Bucket: testBucket1,
+                    Body: testFileBody
+                })
+                .catch(err => expectedError = err)
+                .then(() => {
+                    Should.exist(expectedError);
+                    expectedError.code.should.eql('NetworkingError');
+                    expectedError.name.should.eql('TimeoutError');
+                })
         });
         
     });
