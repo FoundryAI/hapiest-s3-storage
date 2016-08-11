@@ -47,6 +47,23 @@ describe('S3StorageServiceFactory', function() {
            s3Service.getUrl('mynewkey', 'anotherbucket').should.eql('http://localhost:3000/localstorage/anotherbucket/mynewkey');
        });
 
+       it('Should permit readOnly:true for localstorage', function() {
+
+           const s3Service = S3StorageServiceFactory.create({
+               type: 'localstorage',
+               readOnly: true,
+               localConfig: {
+                   path: Path.join(__dirname,'../unit-helper/s3StorageServiceFactory'),
+                   baseUrl: 'http://localhost:3000/localstorage'
+               }
+           }, logger, basePath);
+
+           Should.exist(s3Service);
+           s3Service.getType().should.eql('localstorage');
+           s3Service.getBaseEndpointUrl('mybucket').should.eql('http://localhost:3000/localstorage/mybucket');
+           s3Service.getUrl('mynewkey', 'anotherbucket').should.eql('http://localhost:3000/localstorage/anotherbucket/mynewkey');
+       });
+
        it('Should create an s3 s3Service', function() {
            const s3Service = S3StorageServiceFactory.create({
                type: 's3',
@@ -68,6 +85,23 @@ describe('S3StorageServiceFactory', function() {
        it('Should permit bucket to be optional for s3 storage', function() {
            const s3Service = S3StorageServiceFactory.create({
                type: 's3',
+               s3Config: {
+                   userName: 'user',
+                   awsAccessKey: 'awsAccessKey',
+                   awsSecretKey: 'awsSecretKey'
+               }
+           }, logger, basePath);
+
+           Should.exist(s3Service);
+           s3Service.getType().should.eql('s3');
+           s3Service.getBaseEndpointUrl('somebucket').should.eql('https://s3.amazonaws.com/somebucket');
+           s3Service.getUrl('anotherkey', 'somebucket').should.eql('https://s3.amazonaws.com/somebucket/anotherkey');
+       });
+
+       it('Should allow readOnly for s3 storage', function() {
+           const s3Service = S3StorageServiceFactory.create({
+               type: 's3',
+               readOnly: true,
                s3Config: {
                    userName: 'user',
                    awsAccessKey: 'awsAccessKey',

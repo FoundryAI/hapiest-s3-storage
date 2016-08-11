@@ -2,6 +2,7 @@
   "storage": {
     "type": "s3",
     "bucket": "mybucket",
+    "readOnly": true,
     "s3Config": {
       "userName": "userName",
       "awsAccessKey": "awsAccessKey",

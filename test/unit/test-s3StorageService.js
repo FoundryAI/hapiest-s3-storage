@@ -77,6 +77,18 @@ const s3ServiceForceTimeout = S3StorageServiceFactory.create({
     }
 });
 
+const s3ServiceReadonly = S3StorageServiceFactory.create({
+    type: 's3',
+    bucket: 'vizualai-test',
+    keyPrefix: 'images/tmp',
+    readOnly: true,
+    s3Config: {
+        userName: NodeConfig.get('aws.userName'),
+        awsAccessKey: NodeConfig.get('aws.awsAccessKey'),
+        awsSecretKey: NodeConfig.get('aws.awsSecretKey')
+    }
+});
+
 const testFilePath = Path.join(__dirname,'../unit-helper/s3StorageService/testSources/sample.txt');
 const testFileBody = Fs.readFileSync(testFilePath);
 
@@ -364,6 +376,50 @@ describe('S3StorageService', function() {
                     Should.exist(expectedError);
                     expectedError.code.should.eql('NetworkingError');
                     expectedError.name.should.eql('TimeoutError');
+                })
+        });
+
+        it('Should throw an error on upload() when readOnly:true', function() {
+            const testKey = 'myUploadKey';
+            var expectedError;
+            return s3ServiceReadonly.upload({
+                    Key: testKey,
+                    Bucket: testBucket1,
+                    Body: testFileBody
+                })
+                .catch(err => expectedError = err)
+                .then(() => {
+                    Should.exist(expectedError);
+                    expectedError.message.should.eql('Readonly service - no CUD operations allowed');
+                })
+        });
+
+        it('Should throw an error on putObject() when readOnly:true', function() {
+            const testKey = 'myUploadKey';
+            var expectedError;
+            return s3ServiceReadonly.putObject({
+                    Key: testKey,
+                    Bucket: testBucket1,
+                    Body: testFileBody
+                })
+                .catch(err => expectedError = err)
+                .then(() => {
+                    Should.exist(expectedError);
+                    expectedError.message.should.eql('Readonly service - no CUD operations allowed');
+                })
+        });
+
+        it('Should throw an error on deleteObject() when readOnly:true', function() {
+            const testKey = 'myUploadKey';
+            var expectedError;
+            return s3ServiceReadonly.deleteObject({
+                    Key: testKey,
+                    Bucket: testBucket1
+                })
+                .catch(err => expectedError = err)
+                .then(() => {
+                    Should.exist(expectedError);
+                    expectedError.message.should.eql('Readonly service - no CUD operations allowed');
                 })
         });
         
