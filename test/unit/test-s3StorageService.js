@@ -443,6 +443,22 @@ describe('S3StorageService', function() {
 
         });
 
+        describe('getKeyWithKeyPrefix', function() {
+
+            it('Should prepend the key prefix if the key does not already have it', function () {
+                const keyToTest = 'some/key/file.zip';
+                const keyWithPrefix = s3ServiceLocalStorageWithBucketAndKeyPrefix.getKeyWithKeyPrefix(keyToTest);
+                keyWithPrefix.should.eql('tmp/blah/hello/some/key/file.zip');
+            });
+
+            it('Should return original key if key already has key prefix', function () {
+                const keyToTest = 'tmp/blah/hello/more/key/stuff/file.zip';
+                const keyWithPrefix = s3ServiceLocalStorageWithBucketAndKeyPrefix.getKeyWithKeyPrefix(keyToTest);
+                keyWithPrefix.should.eql(keyToTest);
+            });
+
+        })
+
     })
     
 });
