@@ -424,5 +424,25 @@ describe('S3StorageService', function() {
         });
         
     });
+
+    describe('misc functions', function() {
+
+        describe('stripKeyPrefix', function() {
+
+            it('Should strip the key prefix', function () {
+                const keyToTest = 'tmp/blah/hello/more/key/stuff/file.zip';
+                const keyWithPrefixStripped = s3ServiceLocalStorageWithBucketAndKeyPrefix.stripKeyPrefix(keyToTest);
+                keyWithPrefixStripped.should.eql('more/key/stuff/file.zip');
+            });
+
+            it('Should return original key when it does not match the key prefix', function () {
+                const keyToTest = 'tmp/blah/does/not/match/file.zip';
+                const keyWithPrefixStripped = s3ServiceLocalStorageWithBucketAndKeyPrefix.stripKeyPrefix(keyToTest);
+                keyWithPrefixStripped.should.eql(keyToTest);
+            });
+
+        });
+
+    })
     
 });
