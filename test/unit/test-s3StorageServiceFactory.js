@@ -70,7 +70,6 @@ describe('S3StorageServiceFactory', function() {
                bucket: 'mybucket',
                maxRetriesOnTimeout: 10,
                s3Config: {
-                   userName: 'user',
                    awsAccessKey: 'awsAccessKey',
                    awsSecretKey: 'awsSecretKey'
                }
@@ -86,7 +85,6 @@ describe('S3StorageServiceFactory', function() {
            const s3Service = S3StorageServiceFactory.create({
                type: 's3',
                s3Config: {
-                   userName: 'user',
                    awsAccessKey: 'awsAccessKey',
                    awsSecretKey: 'awsSecretKey'
                }
@@ -103,7 +101,6 @@ describe('S3StorageServiceFactory', function() {
                type: 's3',
                readOnly: true,
                s3Config: {
-                   userName: 'user',
                    awsAccessKey: 'awsAccessKey',
                    awsSecretKey: 'awsSecretKey'
                }
@@ -119,7 +116,6 @@ describe('S3StorageServiceFactory', function() {
            const s3Service = S3StorageServiceFactory.create({
                type: 's3',
                s3Config: {
-                   userName: 'user',
                    awsAccessKey: 'awsAccessKey',
                    awsSecretKey: 'awsSecretKey',
                    httpTimeoutMs: 15000
@@ -140,7 +136,6 @@ describe('S3StorageServiceFactory', function() {
                    path: './'
                },
                s3Config: {
-                   userName: 'user',
                    awsAccessKey: 'awsAccessKey',
                    awsSecretKey: 'awsSecretKey'
                }
@@ -159,7 +154,6 @@ describe('S3StorageServiceFactory', function() {
                    path: './'
                },
                s3Config: {
-                   userName: 'user',
                    awsAccessKey: 'awsAccessKey',
                    awsSecretKey: 'awsSecretKey'
                }
@@ -218,7 +212,6 @@ describe('S3StorageServiceFactory', function() {
            err.isJoi.should.be.True();
        });
 
-       it('Should throw an error if s3Config.userName is not provided for s3', function() {
            let err = null;
            try {
                const s3Service = S3StorageServiceFactory.create({
@@ -242,7 +235,6 @@ describe('S3StorageServiceFactory', function() {
                const s3Service = S3StorageServiceFactory.create({
                    type: 's3',
                    s3Config: {
-                       userName: 'userName',
                        awsSecretKey: 'awsSecretKey'
                    }
                }, logger, basePath);
@@ -261,7 +253,6 @@ describe('S3StorageServiceFactory', function() {
                    type: 's3',
                    bucket: 'bucket',
                    s3Config: {
-                       userName: 'userName',
                        awsAccessKey: 'awsAccessKey'
                    }
                }, logger, basePath);
@@ -286,11 +277,11 @@ describe('S3StorageServiceFactory', function() {
            Should.exist(err);
            err.isJoi.should.be.True();
        });
-       
+
    });
-    
+
     describe('createFromNodeConfig', function() {
-        
+
        it('Should create localstorage from config-1', function() {
            const nodeConfig = getNodeConfig('config-1');
            const s3Service = S3StorageServiceFactory.createFromNodeConfig(nodeConfig, 'storage', logger, basePath);
@@ -304,7 +295,7 @@ describe('S3StorageServiceFactory', function() {
             Should.exist(s3Service);
             s3Service.getType().should.eql('s3');
         });
-        
+
     });
 
 });

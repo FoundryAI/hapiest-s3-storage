@@ -47,7 +47,6 @@ const s3ServiceWithBucket = S3StorageServiceFactory.create({
     type: 's3',
     bucket: 'vizualai-test',
     s3Config: {
-        userName: NodeConfig.get('aws.userName'),
         awsAccessKey: NodeConfig.get('aws.awsAccessKey'),
         awsSecretKey: NodeConfig.get('aws.awsSecretKey'),
         httpTimeoutMs: 15000
@@ -59,7 +58,6 @@ const s3ServiceWithBucketAndKeyPrefix = S3StorageServiceFactory.create({
     bucket: 'vizualai-test',
     keyPrefix: 'images/tmp',
     s3Config: {
-        userName: NodeConfig.get('aws.userName'),
         awsAccessKey: NodeConfig.get('aws.awsAccessKey'),
         awsSecretKey: NodeConfig.get('aws.awsSecretKey')
     }
@@ -70,7 +68,6 @@ const s3ServiceForceTimeout = S3StorageServiceFactory.create({
     bucket: 'vizualai-test',
     keyPrefix: 'images/tmp',
     s3Config: {
-        userName: NodeConfig.get('aws.userName'),
         awsAccessKey: NodeConfig.get('aws.awsAccessKey'),
         awsSecretKey: NodeConfig.get('aws.awsSecretKey'),
         httpTimeoutMs: 1
@@ -83,7 +80,6 @@ const s3ServiceReadonly = S3StorageServiceFactory.create({
     keyPrefix: 'images/tmp',
     readOnly: true,
     s3Config: {
-        userName: NodeConfig.get('aws.userName'),
         awsAccessKey: NodeConfig.get('aws.awsAccessKey'),
         awsSecretKey: NodeConfig.get('aws.awsSecretKey')
     }
@@ -93,7 +89,7 @@ const testFilePath = Path.join(__dirname,'../unit-helper/s3StorageService/testSo
 const testFileBody = Fs.readFileSync(testFilePath);
 
 describe('S3StorageService', function() {
-    
+
     describe('localstorage', function() {
 
         beforeEach(function(done) {
@@ -140,7 +136,7 @@ describe('S3StorageService', function() {
                 (result.Body).should.eql(testFileBody);
             });
         });
-        
+
         it('Should delete an object', function () {
             const testKey = 'some/key/up/there.txt';
             return s3ServiceLocalStorageWithBucket.putObject({
@@ -202,9 +198,9 @@ describe('S3StorageService', function() {
                 ;
         });
 
-        
+
     });
-    
+
     describe('s3', function() {
 
         this.timeout(10000);
@@ -285,7 +281,7 @@ describe('S3StorageService', function() {
                 })
                 ;
         });
-        
+
         it('Should retry putObject when maxRetriesOnTimeout > 0', function() {
             const testKey = 'myPutKey';
 
@@ -422,7 +418,7 @@ describe('S3StorageService', function() {
                     expectedError.message.should.eql('Readonly service - no CUD operations allowed');
                 })
         });
-        
+
     });
 
     describe('misc functions', function() {
@@ -460,5 +456,5 @@ describe('S3StorageService', function() {
         })
 
     })
-    
+
 });
