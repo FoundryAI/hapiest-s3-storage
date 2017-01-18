@@ -59,7 +59,6 @@ const s3ServiceWithBaseUrlBucketAndVirutalHostUrlStyle = S3StorageServiceFactory
     urlStyle: 'virtualHost',
     keyPrefix: 'images/tmp',
     s3Config: {
-        userName: NodeConfig.get('aws.userName'),
         awsAccessKey: NodeConfig.get('aws.awsAccessKey'),
         awsSecretKey: NodeConfig.get('aws.awsSecretKey'),
         baseUrl: 'http://s3.docker',
