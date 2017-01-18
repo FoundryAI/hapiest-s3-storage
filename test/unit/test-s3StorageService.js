@@ -54,6 +54,20 @@ const s3ServiceWithBucket = S3StorageServiceFactory.create({
     }
 });
 
+const s3ServiceWithBaseUrlBucketAndVirutalHostUrlStyle = S3StorageServiceFactory.create({
+    type: 's3',
+    bucket: 'vizualai-test',
+    urlStyle: 'virtualHost',
+    keyPrefix: 'images/tmp',
+    s3Config: {
+        userName: NodeConfig.get('aws.userName'),
+        awsAccessKey: NodeConfig.get('aws.awsAccessKey'),
+        awsSecretKey: NodeConfig.get('aws.awsSecretKey'),
+        baseUrl: 'http://s3.docker',
+        httpTimeoutMs: 15000
+    }
+});
+
 const s3ServiceWithBucketAndKeyPrefix = S3StorageServiceFactory.create({
     type: 's3',
     bucket: 'vizualai-test',
@@ -426,6 +440,19 @@ describe('S3StorageService', function() {
     });
 
     describe('misc functions', function() {
+
+        describe('getBaseEndpointUrl', () => {
+
+            it('should return a base url with a path style', () => {
+               const url = s3ServiceReadonly.getBaseEndpointUrl();
+                url.should.eql('https://s3.amazonaws.com/vizualai-test/images/tmp')
+            });
+
+            it('should return a base url with a virtual host style', () => {
+                const baseEndpointUrl = s3ServiceWithBaseUrlBucketAndVirutalHostUrlStyle.getBaseEndpointUrl();
+                baseEndpointUrl.should.eql('http://vizualai-test.s3.docker/images/tmp');
+            })
+        });
 
         describe('stripKeyPrefix', function() {
 
