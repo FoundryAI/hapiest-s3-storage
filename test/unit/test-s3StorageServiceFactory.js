@@ -212,23 +212,6 @@ describe('S3StorageServiceFactory', function() {
            err.isJoi.should.be.True();
        });
 
-           let err = null;
-           try {
-               const s3Service = S3StorageServiceFactory.create({
-                   type: 's3',
-                   s3Config: {
-                       awsAccessKey: 'awsAccessKey',
-                       awsSecretKey: 'awsSecretKey'
-                   }
-               }, logger, basePath);
-           } catch (e) {
-               err = e;
-           }
-
-           Should.exist(err);
-           err.isJoi.should.be.True();
-       });
-
        it('Should throw an error if s3Config.awsAccessKey is not provided for s3', function() {
            let err = null;
            try {
@@ -275,7 +258,6 @@ describe('S3StorageServiceFactory', function() {
            }
 
            Should.exist(err);
-           err.isJoi.should.be.True();
        });
 
    });
