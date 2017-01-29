@@ -432,6 +432,39 @@ describe('S3StorageService', function() {
                 })
         });
 
+        it('Should put an object and then get the object with the same key', function () {
+            const testKey = 'some/key/up/there.txt';
+            return s3ServiceWithBucket.putObject({
+                Key: testKey,
+                Body: testFileBody
+            })
+            .then((results) => {
+                return s3ServiceWithBucket.getObject({
+                    Key: testKey
+                });
+            })
+            .then(result => {
+                (result.Key).should.eql(testKey);
+                (result.Body).should.eql(testFileBody);
+            });
+        });
+
+        it('Should upload a website configuration', () => {
+           const websiteConfig = {
+               ErrorDocument: {
+                   Key: 'index.html'
+               },
+               IndexDocument: {
+                   Suffix: 'index.html'
+               }
+           };
+
+           return s3ServiceWithBucket.putBucketWebsite(websiteConfig)
+            .catch(err => {
+                (err).should.not.exist();
+            })
+        });
+
     });
 
     describe('misc functions', function() {
