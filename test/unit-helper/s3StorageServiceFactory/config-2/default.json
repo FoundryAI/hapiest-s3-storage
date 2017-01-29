@@ -4,7 +4,6 @@
     "bucket": "mybucket",
     "readOnly": true,
     "s3Config": {
-      "userName": "userName",
       "awsAccessKey": "awsAccessKey",
       "awsSecretKey": "awsSecretKey"
     }

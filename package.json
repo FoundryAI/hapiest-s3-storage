@@ -1,6 +1,6 @@
 {
   "name": "hapiest-s3-storage",
-  "version": "0.0.12",
+  "version": "0.1.0",
   "description": "A simple s3 storage service that's flexible and allows mocking of s3 locally",
   "main": "index.js",
   "scripts": {
@@ -25,7 +25,7 @@
   "devDependencies": {
     "config-uncached": "1.0.2",
     "hapiest-logger": "0.0.5",
-    "mocha": "2.5.3",
+    "mocha": "3.2.0",
     "rmdir": "1.2.0",
     "should": "9.0.2",
     "sinon": "1.17.4"

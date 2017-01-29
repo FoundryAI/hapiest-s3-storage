@@ -47,9 +47,21 @@ const s3ServiceWithBucket = S3StorageServiceFactory.create({
     type: 's3',
     bucket: 'vizualai-test',
     s3Config: {
-        userName: NodeConfig.get('aws.userName'),
         awsAccessKey: NodeConfig.get('aws.awsAccessKey'),
         awsSecretKey: NodeConfig.get('aws.awsSecretKey'),
+        httpTimeoutMs: 15000
+    }
+});
+
+const s3ServiceWithBaseUrlBucketAndVirutalHostUrlStyle = S3StorageServiceFactory.create({
+    type: 's3',
+    bucket: 'vizualai-test',
+    urlStyle: 'virtualHost',
+    keyPrefix: 'images/tmp',
+    s3Config: {
+        awsAccessKey: NodeConfig.get('aws.awsAccessKey'),
+        awsSecretKey: NodeConfig.get('aws.awsSecretKey'),
+        baseUrl: 'http://s3.docker',
         httpTimeoutMs: 15000
     }
 });
@@ -59,7 +71,6 @@ const s3ServiceWithBucketAndKeyPrefix = S3StorageServiceFactory.create({
     bucket: 'vizualai-test',
     keyPrefix: 'images/tmp',
     s3Config: {
-        userName: NodeConfig.get('aws.userName'),
         awsAccessKey: NodeConfig.get('aws.awsAccessKey'),
         awsSecretKey: NodeConfig.get('aws.awsSecretKey')
     }
@@ -70,7 +81,6 @@ const s3ServiceForceTimeout = S3StorageServiceFactory.create({
     bucket: 'vizualai-test',
     keyPrefix: 'images/tmp',
     s3Config: {
-        userName: NodeConfig.get('aws.userName'),
         awsAccessKey: NodeConfig.get('aws.awsAccessKey'),
         awsSecretKey: NodeConfig.get('aws.awsSecretKey'),
         httpTimeoutMs: 1
@@ -83,7 +93,6 @@ const s3ServiceReadonly = S3StorageServiceFactory.create({
     keyPrefix: 'images/tmp',
     readOnly: true,
     s3Config: {
-        userName: NodeConfig.get('aws.userName'),
         awsAccessKey: NodeConfig.get('aws.awsAccessKey'),
         awsSecretKey: NodeConfig.get('aws.awsSecretKey')
     }
@@ -93,7 +102,7 @@ const testFilePath = Path.join(__dirname,'../unit-helper/s3StorageService/testSo
 const testFileBody = Fs.readFileSync(testFilePath);
 
 describe('S3StorageService', function() {
-    
+
     describe('localstorage', function() {
 
         beforeEach(function(done) {
@@ -140,7 +149,7 @@ describe('S3StorageService', function() {
                 (result.Body).should.eql(testFileBody);
             });
         });
-        
+
         it('Should delete an object', function () {
             const testKey = 'some/key/up/there.txt';
             return s3ServiceLocalStorageWithBucket.putObject({
@@ -202,9 +211,9 @@ describe('S3StorageService', function() {
                 ;
         });
 
-        
+
     });
-    
+
     describe('s3', function() {
 
         this.timeout(10000);
@@ -285,7 +294,7 @@ describe('S3StorageService', function() {
                 })
                 ;
         });
-        
+
         it('Should retry putObject when maxRetriesOnTimeout > 0', function() {
             const testKey = 'myPutKey';
 
@@ -422,10 +431,56 @@ describe('S3StorageService', function() {
                     expectedError.message.should.eql('Readonly service - no CUD operations allowed');
                 })
         });
-        
+
+        it('Should put an object and then get the object with the same key', function () {
+            const testKey = 'some/key/up/there.txt';
+            return s3ServiceWithBucket.putObject({
+                Key: testKey,
+                Body: testFileBody
+            })
+            .then((results) => {
+                return s3ServiceWithBucket.getObject({
+                    Key: testKey
+                });
+            })
+            .then(result => {
+                (result.Key).should.eql(testKey);
+                (result.Body).should.eql(testFileBody);
+            });
+        });
+
+        it('Should upload a website configuration', () => {
+           const websiteConfig = {
+               ErrorDocument: {
+                   Key: 'index.html'
+               },
+               IndexDocument: {
+                   Suffix: 'index.html'
+               }
+           };
+
+           return s3ServiceWithBucket.putBucketWebsite(websiteConfig)
+            .catch(err => {
+                (err).should.not.exist();
+            })
+        });
+
     });
 
     describe('misc functions', function() {
+
+        describe('getBaseEndpointUrl', () => {
+
+            it('should return a base url with a path style', () => {
+               const url = s3ServiceReadonly.getBaseEndpointUrl();
+                url.should.eql('https://s3.amazonaws.com/vizualai-test/images/tmp')
+            });
+
+            it('should return a base url with a virtual host style', () => {
+                const baseEndpointUrl = s3ServiceWithBaseUrlBucketAndVirutalHostUrlStyle.getBaseEndpointUrl();
+                baseEndpointUrl.should.eql('http://vizualai-test.s3.docker/images/tmp');
+            })
+        });
 
         describe('stripKeyPrefix', function() {
 
@@ -460,5 +515,5 @@ describe('S3StorageService', function() {
         })
 
     })
-    
+
 });
