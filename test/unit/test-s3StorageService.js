@@ -256,6 +256,34 @@ describe('S3StorageService', function() {
             });
         });
 
+        it('Should delete objects with same prefix', function () {
+            const testKey1 = 'some/key/up/there1.txt';
+            const testKey2 = 'some/key/up/there2.txt';
+            return s3ServiceWithBucket.putObject({
+                Key: testKey1,
+                Body: testFileBody
+            })
+            .then(() => s3ServiceWithBucket.getObject({Key: testKey1}))
+            .then(result => {
+                (result.Key).should.eql(testKey1);
+                (result.Body).should.eql(testFileBody);
+            })
+            .then(() => s3ServiceWithBucket.putObject({
+                Key: testKey2,
+                Body: testFileBody
+            }))
+            .then(() => s3ServiceWithBucket.getObject({Key: testKey2}))
+            .then(result => {
+                (result.Key).should.eql(testKey2);
+                (result.Body).should.eql(testFileBody);
+            })
+            .then(() => s3ServiceWithBucket.deleteObjectsWithPrefix({Prefix: 'some/key/up'}))
+            .then(() => s3ServiceWithBucket.listObjects({Prefix: 'some/key/up'}))
+            .then(results => {
+                results.Contents.length.should.equal(0);
+            })
+        });
+
         it('Should upload an object and then get the object with the same key', function () {
             var testKey = 'myUploadKey';
             return s3ServiceWithBucket.upload({
